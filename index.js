@@ -1,5 +1,6 @@
 const express = require('express');
 const wppconnect = require('@wppconnect-team/wppconnect');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -10,19 +11,15 @@ let clientInstance = null;
 let receivedMessages = [];
 
 app.get('/', (req, res) => {
-  if (qrCodeBase64) {
-    res.send(`
-      <html>
-        <body style="text-align:center; font-family:sans-serif;">
-          <h2>Escanea el QR para vincular WhatsApp</h2>
-          <img src="${qrCodeBase64}" style="width:300px"/>
-          <p>Estado actual: ${currentStatus}</p>
-        </body>
-      </html>
-    `);
-  } else {
-    res.send(`<h2>Esperando QR...</h2><p>Estado actual: ${currentStatus}</p>`);
-  }
+  res.send(`
+    <html>
+      <body style="text-align:center; font-family:sans-serif;">
+        <h2>Escanea el QR para vincular WhatsApp</h2>
+        ${qrCodeBase64 ? `<img src="${qrCodeBase64}" style="width:300px"/>` : '<p>Esperando QR...</p>'}
+        <p>Estado actual: ${currentStatus}</p>
+      </body>
+    </html>
+  `);
 });
 
 app.get('/status', (req, res) => {
@@ -35,10 +32,85 @@ app.get('/messages', (req, res) => {
 
 app.post('/send', async (req, res) => {
   const { to, message } = req.body;
-  if (!clientInstance) return res.status(503).json({ error: 'Cliente no inicializado' });
-
   try {
     const result = await clientInstance.sendText(to, message);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/send-image', async (req, res) => {
+  const { to, imagePath, caption } = req.body;
+  try {
+    const result = await clientInstance.sendImage(to, imagePath, caption);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/contacts', async (req, res) => {
+  try {
+    const contacts = await clientInstance.getAllContacts();
+    res.json(contacts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/chats', async (req, res) => {
+  try {
+    const chats = await clientInstance.getAllChats();
+    res.json(chats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/create-group', async (req, res) => {
+  const { name, participants } = req.body;
+  try {
+    const result = await clientInstance.createGroup(name, participants);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/profile-pic/:id', async (req, res) => {
+  try {
+    const url = await clientInstance.getProfilePicFromServer(req.params.id);
+    res.json({ profilePicUrl: url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/send-file', async (req, res) => {
+  const { to, filePath } = req.body;
+  try {
+    const result = await clientInstance.sendFile(to, filePath);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/send-link', async (req, res) => {
+  const { to, url, text } = req.body;
+  try {
+    const result = await clientInstance.sendLinkPreview(to, url, text);
+    res.json({ success: true, result });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/send-location', async (req, res) => {
+  const { to, lat, long } = req.body;
+  try {
+    const result = await clientInstance.sendLocation(to, lat, long);
     res.json({ success: true, result });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
