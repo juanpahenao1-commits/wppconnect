@@ -18,12 +18,15 @@ const wppconnect = require('../../dist');
 
 wppconnect
   .create({
-    headless: false,
+    headless: true,
+    useChrome: false,
+    browserArgs: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   .then((client) => start(client))
   .catch((error) => {
     console.log(error);
   });
+
 
 function start(client) {
   client.onMessage((message) => {
