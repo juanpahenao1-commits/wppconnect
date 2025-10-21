@@ -1,5 +1,15 @@
+
+const express = require('express');
+const wppconnect = require('@wppconnect-team/wppconnect');
+const path = require('path');
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+
 
 const swaggerSpec = swaggerJsdoc({
   definition: {
@@ -14,14 +24,6 @@ const swaggerSpec = swaggerJsdoc({
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-const express = require('express');
-const wppconnect = require('@wppconnect-team/wppconnect');
-const path = require('path');
-
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 let qrCodeBase64 = '';
 let currentStatus = 'inicializando';
