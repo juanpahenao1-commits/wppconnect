@@ -1,4 +1,3 @@
-import './examples/basic/basic';
 const express = require('express');
 const wppconnect = require('@wppconnect-team/wppconnect');
 
