@@ -121,7 +121,9 @@
     "tmp": "^0.2.5",
     "tree-kill": "^1.2.2",
     "winston": "^3.18.3",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "express": "^4.18.2",
+    "@wppconnect-team/wppconnect": "^1.37.5"
   },
   "optionalDependencies": {
     "@img/sharp-win32-x64": "^0.34.4",
