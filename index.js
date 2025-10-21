@@ -1,3 +1,20 @@
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const swaggerSpec = swaggerJsdoc({
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API WPPConnect',
+      version: '1.0.0',
+      description: 'Documentación interactiva de la API de WhatsApp',
+    },
+  },
+  apis: ['./index.js'], // o donde tengas tus rutas
+});
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 const express = require('express');
 const wppconnect = require('@wppconnect-team/wppconnect');
 const path = require('path');
