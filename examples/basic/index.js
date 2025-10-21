@@ -16,16 +16,20 @@
  */
 const wppconnect = require('../../dist');
 
-wppconnect
-  .create({
-    headless: true,
-    useChrome: false,
-    browserArgs: ['--no-sandbox', '--disable-setuid-sandbox']
-  })
-  .then((client) => start(client))
-  .catch((error) => {
-    console.log(error);
-  });
+wppconnect.create({
+  session: 'default',
+  headless: true,
+  useChrome: false,
+  browserArgs: ['--no-sandbox', '--disable-setuid-sandbox'],
+  autoClose: 0, // 0 = nunca cerrar automáticamente
+  catchQR: (base64Qr) => {
+    qrCodeBase64 = base64Qr;
+    console.log('QR capturado');
+  },
+  statusFind: (statusSession) => {
+    console.log('Estado de sesión:', statusSession);
+  }
+});
 
 
 function start(client) {
